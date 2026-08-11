@@ -7,7 +7,7 @@ app = Flask(__name__)
 HTML = r"""
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><meta name="google-site-verification" content="Vbct_9UjwRQFwXfyKxhGdIt6UfqLD50XKrEjfN65wdo">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NETPULSE</title>
