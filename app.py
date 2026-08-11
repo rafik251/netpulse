@@ -5,32 +5,27 @@ import os
 
 app = Flask(__name__)
 
-HTML = r"""
+HTML = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>NETPULSE — Internet Speed Test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NETPULSE</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
     margin:0;
     min-height:100vh;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family:Arial,sans-serif;
     color:white;
     background:
-        radial-gradient(circle at 50% 0%,#12365b 0%,#07111f 35%,#02050a 75%);
-    overflow-x:hidden;
+    radial-gradient(circle at 50% 0%,#12365b,#07111f 40%,#02050a 80%);
 }
 
 .container{
-    width:100%;
     max-width:760px;
     margin:auto;
     padding:25px 15px 45px;
@@ -45,7 +40,6 @@ body{
     color:#94a3b8;
     font-size:14px;
     letter-spacing:3px;
-    text-transform:uppercase;
 }
 
 .logo{
@@ -53,31 +47,21 @@ body{
     font-size:42px;
     font-weight:900;
     color:#38bdf8;
-    text-shadow:
-        0 0 10px #38bdf8,
-        0 0 35px rgba(56,189,248,.55);
+    text-shadow:0 0 10px #38bdf8,0 0 35px #38bdf855;
 }
 
 .subtitle{
     color:#64748b;
     margin-top:7px;
-    letter-spacing:1px;
 }
 
 .card{
-    background:rgba(8,17,32,.86);
-    border:1px solid rgba(148,163,184,.12);
+    background:#081120ee;
+    border:1px solid #ffffff12;
     border-radius:25px;
     padding:22px;
     margin-bottom:17px;
-    box-shadow:
-        0 20px 70px rgba(0,0,0,.45),
-        inset 0 1px rgba(255,255,255,.03);
-    backdrop-filter:blur(15px);
-}
-
-.card h3{
-    margin-top:0;
+    box-shadow:0 20px 70px #00000073;
 }
 
 .info{
@@ -90,26 +74,21 @@ body{
     padding:13px;
     border-radius:15px;
     background:#07101d;
-    border:1px solid rgba(255,255,255,.05);
 }
 
 .label{
     color:#64748b;
     font-size:10px;
     text-transform:uppercase;
-    letter-spacing:1px;
 }
 
 .value{
     margin-top:6px;
     font-weight:bold;
-    color:#e2e8f0;
     word-break:break-word;
 }
 
 .start{
-    position:relative;
-    overflow:hidden;
     width:100%;
     margin-top:20px;
     padding:18px;
@@ -118,108 +97,50 @@ body{
     color:white;
     font-size:19px;
     font-weight:900;
-    letter-spacing:1px;
     cursor:pointer;
-
     background:linear-gradient(
-        90deg,
-        #06b6d4,
-        #6366f1,
-        #a855f7,
-        #06b6d4
+        90deg,#06b6d4,#6366f1,#a855f7
     );
-    background-size:300% 100%;
-
-    box-shadow:
-        0 0 20px rgba(6,182,212,.35),
-        0 0 50px rgba(99,102,241,.2);
-
-    animation:gradient 5s linear infinite;
-    transition:.25s;
-}
-
-.start:hover{
-    transform:translateY(-3px) scale(1.01);
-    box-shadow:
-        0 0 30px rgba(56,189,248,.7),
-        0 0 70px rgba(99,102,241,.35);
-}
-
-.start:active{
-    transform:scale(.97);
 }
 
 .start:disabled{
-    opacity:.55;
-    cursor:not-allowed;
-    animation:none;
+    opacity:.5;
 }
 
-@keyframes gradient{
-    0%{background-position:0%}
-    100%{background-position:300%}
+.status{
+    text-align:center;
+    margin-top:14px;
+    color:#94a3b8;
+}
+
+.hidden{
+    display:none;
 }
 
 .rocket{
-    font-size:75px;
+    font-size:70px;
     text-align:center;
-    margin:15px 0;
-    filter:drop-shadow(0 0 15px #38bdf8);
-}
-
-.rocket.running{
-    animation:rocket 1s infinite ease-in-out;
-}
-
-@keyframes rocket{
-    0%,100%{
-        transform:translateY(0) rotate(-4deg);
-    }
-    50%{
-        transform:translateY(-18px) rotate(4deg);
-    }
-}
-
-.flame{
-    display:none;
-    text-align:center;
-    color:#38bdf8;
-    font-size:20px;
-    letter-spacing:6px;
-    animation:flame .25s infinite alternate;
-}
-
-.running + .flame{
-    display:block;
-}
-
-@keyframes flame{
-    from{opacity:.4;transform:scaleX(.8)}
-    to{opacity:1;transform:scaleX(1.2)}
-}
-
-.gauge{
-    text-align:center;
-    padding:10px 0 20px;
+    margin:15px;
 }
 
 .speed{
+    text-align:center;
     font-family:monospace;
-    font-size:64px;
+    font-size:60px;
     font-weight:900;
     color:#38bdf8;
-    text-shadow:0 0 25px rgba(56,189,248,.4);
 }
 
 .unit{
+    text-align:center;
     color:#94a3b8;
-    font-size:14px;
 }
 
 .results{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:10px;
+    margin-top:20px;
 }
 
 .advanced{
@@ -234,7 +155,6 @@ body{
     border-radius:16px;
     padding:15px 8px;
     text-align:center;
-    border:1px solid rgba(255,255,255,.05);
 }
 
 .number{
@@ -252,36 +172,25 @@ body{
 }
 
 .score{
-    margin:20px 0;
+    margin:25px 0;
     text-align:center;
     font-size:42px;
     font-weight:900;
     color:#22c55e;
-    text-shadow:0 0 20px rgba(34,197,94,.3);
 }
 
 .service{
     display:flex;
     justify-content:space-between;
-    align-items:center;
     padding:14px;
     margin-top:8px;
     border-radius:14px;
     background:#07101d;
-    border:1px solid rgba(255,255,255,.04);
 }
 
-.good{
-    color:#22c55e;
-}
-
-.medium{
-    color:#facc15;
-}
-
-.bad{
-    color:#ef4444;
-}
+.good{color:#22c55e}
+.medium{color:#facc15}
+.bad{color:#ef4444}
 
 .advice{
     margin-top:16px;
@@ -289,32 +198,16 @@ body{
     border-radius:16px;
     line-height:1.7;
     color:#cbd5e1;
-    background:rgba(56,189,248,.07);
-    border:1px solid rgba(56,189,248,.14);
-}
-
-.status{
-    text-align:center;
-    margin-top:14px;
-    color:#94a3b8;
-}
-
-.hidden{
-    display:none;
+    background:#38bdf812;
 }
 
 @media(max-width:550px){
-
     .info{
         grid-template-columns:1fr;
     }
 
     .results{
         grid-template-columns:1fr;
-    }
-
-    .advanced{
-        grid-template-columns:1fr 1fr;
     }
 
     .speed{
@@ -335,7 +228,9 @@ body{
 <div class="header">
     <div class="welcome">WELCOME TO</div>
     <div class="logo">⚡ NETPULSE</div>
-    <div class="subtitle">SMART INTERNET PERFORMANCE TEST</div>
+    <div class="subtitle">
+        SMART INTERNET PERFORMANCE TEST
+    </div>
 </div>
 
 <div class="card">
@@ -378,13 +273,10 @@ Ready to test your connection
 
 <div class="card hidden" id="results">
 
-<div class="rocket" id="rocket">🚀</div>
-<div class="flame">• • • • •</div>
+<div class="rocket">🚀</div>
 
-<div class="gauge">
 <div class="speed" id="liveSpeed">0.0</div>
-<div class="unit" id="speedType">Mbps</div>
-</div>
+<div class="unit">Mbps</div>
 
 <div class="results">
 
@@ -419,9 +311,7 @@ Ready to test your connection
 
 </div>
 
-<div class="score" id="score">
---/100
-</div>
+<div class="score" id="score">--/100</div>
 
 <h3>📊 CONNECTION QUALITY</h3>
 
@@ -451,7 +341,7 @@ Ready to test your connection
 </div>
 
 <div class="advice" id="advice">
-💡 Smart Advisor will appear here after the test.
+💡 Smart Advisor
 </div>
 
 </div>
@@ -464,102 +354,91 @@ async function loadIP(){
 
     try{
 
-        const res = await fetch(
-            "https://ipapi.co/json/",
-            {cache:"no-store"}
+        const response = await fetch(
+            "https://api64.ipify.org?format=json"
         );
 
-        const data = await res.json();
+        const data = await response.json();
 
-        document.getElementById("ip").innerText =
-            data.ip || "Unknown";
+        const ip = data.ip;
+
+        document.getElementById("ip").innerText = ip;
+
+        const geo = await fetch(
+            "/lookup-ip?ip=" + encodeURIComponent(ip)
+        );
+
+        const info = await geo.json();
 
         document.getElementById("country").innerText =
-            (data.country_code ? getFlag(data.country_code) + " " : "") +
-            (data.country_name || "Unknown");
+            (info.flag || "") + " " +
+            (info.country || "Unknown");
 
         document.getElementById("city").innerText =
-            data.city || "Unknown";
+            info.city || "Unknown";
 
         document.getElementById("isp").innerText =
-            data.org || "Unknown";
+            info.isp || "Unknown";
 
-    }catch(e){
+    }catch(error){
 
-        document.getElementById("ip").innerText="Unavailable";
-        document.getElementById("country").innerText="Unknown";
-        document.getElementById("city").innerText="Unknown";
-        document.getElementById("isp").innerText="Unknown";
+        document.getElementById("ip").innerText =
+            "Unavailable";
+
+        document.getElementById("country").innerText =
+            "Unknown";
+
+        document.getElementById("city").innerText =
+            "Unknown";
+
+        document.getElementById("isp").innerText =
+            "Unknown";
     }
 }
 
-function getFlag(code){
-
-    if(!code || code.length !== 2)
-        return "🌍";
-
-    return String.fromCodePoint(
-        ...[...code.toUpperCase()].map(
-            c => 127397 + c.charCodeAt()
-        )
-    );
-}
 
 async function pingTest(){
 
-    let values=[];
-    let lost=0;
-    const total=10;
+    let values = [];
+    let lost = 0;
 
-    for(let i=0;i<total;i++){
+    for(let i=0;i<10;i++){
 
-        const controller=new AbortController();
-
-        const timeout=setTimeout(
-            ()=>controller.abort(),
-            2000
-        );
-
-        const start=performance.now();
+        const start = performance.now();
 
         try{
 
             await fetch(
-                "/ping?x="+Math.random(),
-                {
-                    cache:"no-store",
-                    signal:controller.signal
-                }
+                "/ping?x=" + Math.random(),
+                {cache:"no-store"}
             );
 
-            const end=performance.now();
+            values.push(
+                performance.now() - start
+            );
 
-            clearTimeout(timeout);
-
-            values.push(end-start);
-
-        }catch(e){
+        }catch(error){
 
             lost++;
         }
 
         await new Promise(
-            r=>setTimeout(r,70)
+            resolve => setTimeout(resolve,70)
         );
     }
 
-    if(values.length===0){
+    if(values.length === 0){
 
         return {
             ping:999,
             jitter:0,
-            packetLoss:100
+            loss:100
         };
     }
 
     values.sort((a,b)=>a-b);
 
-    let jitter=0;
+    let jitter = 0;
 
     for(let i=1;i<values.length;i++){
 
@@ -568,117 +447,95 @@ async function pingTest(){
         );
     }
 
-    jitter =
-        values.length>1
-        ? jitter/(values.length-1)
-        : 0;
+    if(values.length > 1){
+
+        jitter =
+            jitter/(values.length-1);
+    }
 
     return {
-
         ping:Math.round(values[0]),
-
         jitter:Math.round(jitter),
-
-        packetLoss:
-            Number(
-                ((lost/total)*100).toFixed(1)
-            )
+        loss:Number(
+            ((lost/10)*100).toFixed(1)
+        )
     };
 }
 
+
 async function downloadTest(){
 
-    const live=
-        document.getElementById("liveSpeed");
+    const start = performance.now();
+    let bytes = 0;
 
-    const duration=6000;
+    while(performance.now()-start < 5000){
 
-    const start=performance.now();
-
-    let bytes=0;
-
-    while(
-        performance.now()-start < duration
-    ){
-
-        const res=await fetch(
-            "/download?x="+Math.random(),
+        const response = await fetch(
+            "/download?x=" + Math.random(),
             {cache:"no-store"}
         );
 
-        const blob=await res.blob();
+        const blob = await response.blob();
 
         bytes += blob.size;
 
-        const elapsed=
+        const seconds =
             (performance.now()-start)/1000;
 
-        const speed=
-            bytes*8/
-            elapsed/
-            1000000;
+        const speed =
+            bytes*8/seconds/1000000;
 
-        live.innerText=
+        document.getElementById(
+            "liveSpeed"
+        ).innerText =
             speed.toFixed(1);
     }
 
-    const elapsed=
+    const seconds =
         (performance.now()-start)/1000;
 
-    return bytes*8/
-        elapsed/
-        1000000;
+    return bytes*8/seconds/1000000;
 }
+
 
 async function uploadTest(){
 
-    const live=
-        document.getElementById("liveSpeed");
+    const start = performance.now();
+    let bytes = 0;
 
-    const duration=5000;
+    const data =
+        new Uint8Array(512*1024);
 
-    const start=performance.now();
-
-    let bytes=0;
-
-    const size=512*1024;
-
-    const payload=
-        new Uint8Array(size);
-
-    while(
-        performance.now()-start < duration
-    ){
+    while(performance.now()-start < 5000){
 
         await fetch(
-            "/upload?x="+Math.random(),
+            "/upload?x=" + Math.random(),
             {
                 method:"POST",
-                body:payload
+                body:data
             }
         );
 
-        bytes += size;
+        bytes += data.length;
 
-        const elapsed=
+        const seconds =
             (performance.now()-start)/1000;
 
-        const speed=
-            bytes*8/
-            elapsed/
-            1000000;
+        const speed =
+            bytes*8/seconds/1000000;
 
-        live.innerText=
+        document.getElementById(
+            "liveSpeed"
+        ).innerText =
             speed.toFixed(1);
     }
 
-    const elapsed=
+    const seconds =
         (performance.now()-start)/1000;
 
-    return bytes*8/
-        elapsed/
-        1000000;
+    return bytes*8/seconds/1000000;
 }
+
 
 function scoreTest(
     download,
@@ -688,29 +545,33 @@ function scoreTest(
     loss
 ){
 
-    let score=100;
+    let score = 100;
 
-    if(download<10)
-        score-=25;
-    else if(download<30)
-        score-=15;
-    else if(download<50)
-        score-=5;
+    if(download < 10){
+        score -= 25;
+    }else if(download < 30){
+        score -= 15;
+    }else if(download < 50){
+        score -= 5;
+    }
 
-    if(upload<5)
-        score-=15;
-    else if(upload<15)
-        score-=8;
+    if(upload < 5){
+        score -= 15;
+    }else if(upload < 15){
+        score -= 8;
+    }
 
-    if(ping>100)
-        score-=25;
-    else if(ping>50)
-        score-=12;
+    if(ping > 100){
+        score -= 25;
+    }else if(ping > 50){
+        score -= 12;
+    }
 
-    if(jitter>20)
-        score-=15;
+    if(jitter > 20){
+        score -= 15;
+    }
 
-    score -= loss*3;
+    score -= loss * 3;
 
     return Math.max(
         0,
@@ -718,19 +579,20 @@ function scoreTest(
     );
 }
 
-function setResult(
+
+function setQuality(
     id,
     text,
-    type
+    color
 ){
 
-    const el=
+    const element =
         document.getElementById(id);
 
-    el.innerText=text;
-
-    el.className=type;
+    element.innerText = text;
+    element.className = color;
 }
+
 
 function analyze(
     download,
@@ -740,24 +602,17 @@ function analyze(
     loss
 ){
 
-    if(
-        ping<=40 &&
-        jitter<=10 &&
-        loss===0
-    ){
+    if(ping <= 40 && jitter <= 10 && loss === 0){
 
-        setResult(
+        setQuality(
             "gaming",
             "🟢 Excellent",
             "good"
         );
 
-    }else if(
-        ping<=70 &&
-        loss<5
-    ){
+    }else if(ping <= 70 && loss < 5){
 
-        setResult(
+        setQuality(
             "gaming",
             "🟡 Good",
             "medium"
@@ -765,24 +620,25 @@ function analyze(
 
     }else{
 
-        setResult(
+        setQuality(
             "gaming",
             "🔴 Poor",
             "bad"
         );
     }
 
-    if(download>=25){
 
-        setResult(
+    if(download >= 25){
+
+        setQuality(
             "video",
             "🟢 Excellent — 4K UHD",
             "good"
         );
 
-    }else if(download>=12){
+    }else if(download >= 12){
 
-        setResult(
+        setQuality(
             "video",
             "🟡 Good — Full HD",
             "medium"
@@ -790,41 +646,43 @@ function analyze(
 
     }else{
 
-        setResult(
+        setQuality(
             "video",
             "🔴 Poor",
             "bad"
         );
     }
 
-    if(upload>=10 && jitter<15){
 
-        setResult(
+    if(upload >= 10 && jitter < 15){
+
+        setQuality(
             "stream",
-            "🟢 Excellent — 1080p",
+            "🟢 Excellent",
             "good"
         );
 
-    }else if(upload>=5){
+    }else if(upload >= 5){
 
-        setResult(
+        setQuality(
             "stream",
-            "🟡 Moderate — 720p",
+            "🟡 Moderate",
             "medium"
         );
 
     }else{
 
-        setResult(
+        setQuality(
             "stream",
             "🔴 Poor",
             "bad"
         );
     }
 
-    if(ping<=100 && loss<2){
 
-        setResult(
+    if(ping <= 100 && loss < 2){
+
+        setQuality(
             "calls",
             "🟢 Excellent",
             "good"
@@ -832,24 +690,25 @@ function analyze(
 
     }else{
 
-        setResult(
+        setQuality(
             "calls",
             "🟡 Fair",
             "medium"
         );
     }
 
-    if(download>=50){
 
-        setResult(
+    if(download >= 50){
+
+        setQuality(
             "files",
             "🟢 Very Fast",
             "good"
         );
 
-    }else if(download>=20){
+    }else if(download >= 20){
 
-        setResult(
+        setQuality(
             "files",
             "🟡 Fast",
             "medium"
@@ -857,150 +716,139 @@ function analyze(
 
     }else{
 
-        setResult(
+        setQuality(
             "files",
             "🔴 Slow",
             "bad"
         );
     }
 
-    let advice="";
 
-    if(loss>2){
+    let advice;
 
-        advice=
-        "High packet loss detected. Check your Wi-Fi signal, router or network cable.";
+    if(loss > 2){
 
-    }else if(jitter>20){
+        advice =
+            "High packet loss detected.";
 
-        advice=
-        "Your connection has high jitter. This can cause unstable gaming and calls.";
+    }else if(jitter > 20){
 
-    }else if(ping>80){
+        advice =
+            "Your connection has high jitter.";
 
-        advice=
-        "Your ping is relatively high. This may affect competitive online gaming.";
+    }else if(ping > 80){
 
-    }else if(download<15){
+        advice =
+            "Your ping is relatively high.";
 
-        advice=
-        "Your download speed is relatively low for heavy downloads and 4K streaming.";
+    }else if(download < 15){
+
+        advice =
+            "Your download speed is relatively low.";
 
     }else{
 
-        advice=
-        "Your connection is fast and stable for gaming, streaming and everyday use.";
+        advice =
+            "Your connection is fast and stable.";
     }
 
-    document.getElementById("advice").innerText=
-        "💡 Smart Advisor: "+advice;
+    document.getElementById(
+        "advice"
+    ).innerText =
+        "💡 Smart Advisor: " + advice;
 }
+
 
 async function startTest(){
 
-    const button=
+    const button =
         document.getElementById("start");
 
-    const status=
+    const status =
         document.getElementById("status");
 
-    const results=
-        document.getElementById("results");
+    document.getElementById(
+        "results"
+    ).classList.remove("hidden");
 
-    const rocket=
-        document.getElementById("rocket");
+    button.disabled = true;
 
-    const speedType=
-        document.getElementById("speedType");
+    status.innerText =
+        "🌐 Testing connection...";
 
-    button.disabled=true;
-
-    results.classList.remove("hidden");
-
-    rocket.classList.add("running");
-
-    document.getElementById("liveSpeed").innerText="0.0";
-
-    document.getElementById("download").innerText="--";
-    document.getElementById("upload").innerText="--";
-    document.getElementById("ping").innerText="--";
-    document.getElementById("jitter").innerText="--";
-    document.getElementById("packetLoss").innerText="--";
-
-    status.innerText=
-        "🌐 Testing connection quality...";
-
-    const quality=
+    const quality =
         await pingTest();
 
-    document.getElementById("ping").innerText=
-        quality.ping;
+    document.getElementById(
+        "ping"
+    ).innerText = quality.ping;
 
-    document.getElementById("jitter").innerText=
-        quality.jitter;
+    document.getElementById(
+        "jitter"
+    ).innerText = quality.jitter;
 
-    document.getElementById("packetLoss").innerText=
-        quality.packetLoss;
+    document.getElementById(
+        "packetLoss"
+    ).innerText = quality.loss;
 
-    status.innerText=
-        "⬇️ Measuring download speed...";
 
-    speedType.innerText=
-        "Mbps — DOWNLOAD";
+    status.innerText =
+        "⬇️ Measuring download...";
 
-    const download=
+    const download =
         await downloadTest();
 
-    document.getElementById("download").innerText=
+    document.getElementById(
+        "download"
+    ).innerText =
         download.toFixed(2);
 
-    status.innerText=
-        "⬆️ Measuring upload speed...";
 
-    speedType.innerText=
-        "Mbps — UPLOAD";
+    status.innerText =
+        "⬆️ Measuring upload...";
 
-    const upload=
+    const upload =
         await uploadTest();
 
-    document.getElementById("upload").innerText=
+    document.getElementById(
+        "upload"
+    ).innerText =
         upload.toFixed(2);
 
-    speedType.innerText="Mbps";
 
-    document.getElementById("liveSpeed").innerText=
-        download.toFixed(1);
-
-    const score=
+    const score =
         scoreTest(
             download,
             upload,
             quality.ping,
             quality.jitter,
-            quality.packetLoss
+            quality.loss
         );
 
-    document.getElementById("score").innerText=
-        score+"/100";
+    document.getElementById(
+        "score"
+    ).innerText =
+        score + "/100";
+
 
     analyze(
         download,
         upload,
         quality.ping,
         quality.jitter,
-        quality.packetLoss
+        quality.loss
     );
 
-    rocket.classList.remove("running");
 
-    status.innerText=
+    status.innerText =
         "✅ TEST COMPLETE";
 
-    button.disabled=false;
+    button.disabled = false;
 
-    button.innerText=
+    button.innerText =
         "🔄 TEST AGAIN";
 }
+
 
 loadIP();
 
@@ -1016,8 +864,74 @@ def home():
     return render_template_string(HTML)
 
 
+@app.route("/lookup-ip")
+def lookup_ip():
+
+    ip = request.args.get("ip", "").strip()
+
+    if not ip:
+        return jsonify({
+            "country": "Unknown",
+            "city": "Unknown",
+            "isp": "Unknown",
+            "flag": ""
+        })
+
+    try:
+
+        response = requests.get(
+            "https://ipwho.is/" + ip,
+            timeout=10,
+            headers={
+                "User-Agent": "NETPULSE"
+            }
+        )
+
+        data = response.json()
+
+        country_code = (
+            data.get("country_code") or ""
+        ).upper()
+
+        flag = ""
+
+        if len(country_code) == 2:
+
+            flag = "".join(
+                chr(127397 + ord(c))
+                for c in country_code
+            )
+
+        connection = data.get("connection") or {}
+
+        return jsonify({
+            "country":
+                data.get("country") or "Unknown",
+
+            "city":
+                data.get("city") or "Unknown",
+
+            "isp":
+                connection.get("isp") or "Unknown",
+
+            "flag": flag
+        })
+
+    except Exception as error:
+
+        print("IP lookup error:", error)
+
+        return jsonify({
+            "country": "Unknown",
+            "city": "Unknown",
+            "isp": "Unknown",
+            "flag": ""
+        })
+
+
 @app.route("/ping")
 def ping():
+
     return jsonify({
         "ok": True,
         "time": time.time()
@@ -1027,18 +941,16 @@ def ping():
 @app.route("/download")
 def download():
 
-    data=os.urandom(
-        2*1024*1024
+    data = os.urandom(
+        2 * 1024 * 1024
     )
 
     return Response(
         data,
         mimetype="application/octet-stream",
         headers={
-            "Cache-Control":
-                "no-store, no-cache, must-revalidate",
-            "Content-Length":
-                str(len(data))
+            "Cache-Control": "no-store",
+            "Content-Length": str(len(data))
         }
     )
 
@@ -1049,17 +961,15 @@ def upload():
     request.get_data()
 
     return jsonify({
-        "ok":True
+        "ok": True
     })
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     print()
-    print("⚡ NETPULSE v2 ENGINE ONLINE")
-    print("==========================================")
-    print("🌐 Local: http://127.0.0.1:5000")
-    print("==========================================")
+    print("⚡ NETPULSE ENGINE ONLINE")
+    print("🌐 http://127.0.0.1:5000")
     print()
 
     app.run(
