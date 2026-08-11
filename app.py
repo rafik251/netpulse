@@ -2,7 +2,6 @@ from flask import Flask, render_template_string, jsonify, request, Response
 import requests
 import time
 import os
-import random
 
 app = Flask(__name__)
 
@@ -12,69 +11,72 @@ HTML = r"""
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NETPULSE — Smart Internet Speed Test</title>
+
+<title>NETPULSE — Internet Speed Test</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
     min-height:100vh;
     font-family:Arial,Helvetica,sans-serif;
-    color:#fff;
+    color:white;
     background:
-      radial-gradient(circle at 50% 10%,#123b63 0%,#071321 35%,#03060b 75%);
-    display:flex;
-    justify-content:center;
+        radial-gradient(circle at 50% 0%,#12365b 0%,#07111f 35%,#02050a 75%);
     overflow-x:hidden;
-}
-
-body.testing{
-    background:
-      radial-gradient(circle at 50% 35%,#123e61 0%,#061522 35%,#020409 75%);
 }
 
 .container{
     width:100%;
-    max-width:720px;
-    padding:24px 15px 40px;
+    max-width:760px;
+    margin:auto;
+    padding:25px 15px 45px;
 }
 
 .header{
     text-align:center;
-    margin-bottom:18px;
-}
-
-.logo{
-    font-size:38px;
-    font-weight:900;
-    letter-spacing:2px;
-    color:#38bdf8;
-    text-shadow:
-      0 0 10px #38bdf8,
-      0 0 30px rgba(56,189,248,.5);
+    margin-bottom:22px;
 }
 
 .welcome{
-    margin-top:7px;
-    color:#cbd5e1;
+    color:#94a3b8;
     font-size:14px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+}
+
+.logo{
+    margin-top:8px;
+    font-size:42px;
+    font-weight:900;
+    color:#38bdf8;
+    text-shadow:
+        0 0 10px #38bdf8,
+        0 0 35px rgba(56,189,248,.55);
+}
+
+.subtitle{
+    color:#64748b;
+    margin-top:7px;
     letter-spacing:1px;
 }
 
 .card{
-    background:rgba(9,18,32,.88);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:24px;
-    padding:20px;
-    margin-bottom:15px;
-    box-shadow:0 15px 50px rgba(0,0,0,.45);
-    backdrop-filter:blur(12px);
+    background:rgba(8,17,32,.86);
+    border:1px solid rgba(148,163,184,.12);
+    border-radius:25px;
+    padding:22px;
+    margin-bottom:17px;
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.45),
+        inset 0 1px rgba(255,255,255,.03);
+    backdrop-filter:blur(15px);
 }
 
-.connection-title{
-    text-align:center;
-    color:#e2e8f0;
+.card h3{
     margin-top:0;
 }
 
@@ -85,135 +87,62 @@ body.testing{
 }
 
 .infoBox{
+    padding:13px;
+    border-radius:15px;
     background:#07101d;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:14px;
-    padding:12px;
+    border:1px solid rgba(255,255,255,.05);
 }
 
 .label{
     color:#64748b;
     font-size:10px;
     text-transform:uppercase;
+    letter-spacing:1px;
 }
 
 .value{
     margin-top:6px;
-    color:#f8fafc;
-    font-size:14px;
     font-weight:bold;
+    color:#e2e8f0;
     word-break:break-word;
 }
-
-/* SPEED AREA */
-
-.speedArea{
-    position:relative;
-    height:270px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin:5px 0;
-}
-
-.ring{
-    position:absolute;
-    width:225px;
-    height:225px;
-    border-radius:50%;
-    border:7px solid #13263a;
-    border-top-color:#38bdf8;
-    border-right-color:#6366f1;
-    box-shadow:
-      0 0 20px rgba(56,189,248,.15),
-      inset 0 0 20px rgba(56,189,248,.05);
-}
-
-.testing .ring{
-    animation:spin 1s linear infinite;
-    box-shadow:
-      0 0 25px #38bdf8,
-      0 0 70px rgba(99,102,241,.35);
-}
-
-@keyframes spin{
-    to{transform:rotate(360deg)}
-}
-
-.speedCenter{
-    position:relative;
-    z-index:2;
-    text-align:center;
-}
-
-.liveSpeed{
-    font-size:50px;
-    font-weight:900;
-    color:#fff;
-    font-family:monospace;
-    text-shadow:0 0 20px rgba(56,189,248,.5);
-}
-
-.speedUnit{
-    color:#38bdf8;
-    font-size:14px;
-}
-
-/* ROCKET */
-
-.rocket{
-    position:absolute;
-    z-index:3;
-    font-size:48px;
-    bottom:15px;
-    opacity:.15;
-    filter:drop-shadow(0 0 10px #38bdf8);
-}
-
-.testing .rocket{
-    opacity:1;
-    animation:rocketFly 1.8s ease-in-out infinite;
-}
-
-@keyframes rocketFly{
-    0%{
-        transform:translateY(30px) scale(.85);
-    }
-    50%{
-        transform:translateY(-65px) scale(1.05);
-    }
-    100%{
-        transform:translateY(30px) scale(.85);
-    }
-}
-
-/* START BUTTON */
 
 .start{
     position:relative;
     overflow:hidden;
     width:100%;
+    margin-top:20px;
+    padding:18px;
     border:0;
     border-radius:55px;
-    padding:18px;
+    color:white;
     font-size:19px;
     font-weight:900;
-    color:#fff;
+    letter-spacing:1px;
     cursor:pointer;
-    background:linear-gradient(135deg,#06b6d4,#6366f1,#8b5cf6);
-    background-size:200% 200%;
+
+    background:linear-gradient(
+        90deg,
+        #06b6d4,
+        #6366f1,
+        #a855f7,
+        #06b6d4
+    );
+    background-size:300% 100%;
+
     box-shadow:
-      0 0 20px rgba(56,189,248,.35),
-      0 8px 25px rgba(0,0,0,.35);
-    transition:.3s;
+        0 0 20px rgba(6,182,212,.35),
+        0 0 50px rgba(99,102,241,.2);
+
+    animation:gradient 5s linear infinite;
+    transition:.25s;
 }
 
 .start:hover{
-    transform:translateY(-2px) scale(1.01);
-    background-position:100% 50%;
+    transform:translateY(-3px) scale(1.01);
     box-shadow:
-      0 0 35px rgba(56,189,248,.65),
-      0 10px 30px rgba(0,0,0,.4);
+        0 0 30px rgba(56,189,248,.7),
+        0 0 70px rgba(99,102,241,.35);
 }
 
 .start:active{
@@ -221,42 +150,71 @@ body.testing{
 }
 
 .start:disabled{
-    opacity:.65;
+    opacity:.55;
     cursor:not-allowed;
+    animation:none;
 }
 
-.start::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:-100%;
-    width:50%;
-    height:100%;
-    background:linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.45),
-      transparent
-    );
-    transform:skewX(-20deg);
+@keyframes gradient{
+    0%{background-position:0%}
+    100%{background-position:300%}
 }
 
-.start:active::after{
-    animation:shine .6s;
-}
-
-@keyframes shine{
-    to{left:150%}
-}
-
-.status{
+.rocket{
+    font-size:75px;
     text-align:center;
-    color:#94a3b8;
-    margin-top:13px;
-    font-size:13px;
+    margin:15px 0;
+    filter:drop-shadow(0 0 15px #38bdf8);
 }
 
-/* RESULTS */
+.rocket.running{
+    animation:rocket 1s infinite ease-in-out;
+}
+
+@keyframes rocket{
+    0%,100%{
+        transform:translateY(0) rotate(-4deg);
+    }
+    50%{
+        transform:translateY(-18px) rotate(4deg);
+    }
+}
+
+.flame{
+    display:none;
+    text-align:center;
+    color:#38bdf8;
+    font-size:20px;
+    letter-spacing:6px;
+    animation:flame .25s infinite alternate;
+}
+
+.running + .flame{
+    display:block;
+}
+
+@keyframes flame{
+    from{opacity:.4;transform:scaleX(.8)}
+    to{opacity:1;transform:scaleX(1.2)}
+}
+
+.gauge{
+    text-align:center;
+    padding:10px 0 20px;
+}
+
+.speed{
+    font-family:monospace;
+    font-size:64px;
+    font-weight:900;
+    color:#38bdf8;
+    text-shadow:0 0 25px rgba(56,189,248,.4);
+}
+
+.unit{
+    color:#94a3b8;
+    font-size:14px;
+}
 
 .results{
     display:grid;
@@ -273,87 +231,99 @@ body.testing{
 
 .result{
     background:#07101d;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:15px;
-    padding:14px 8px;
+    border-radius:16px;
+    padding:15px 8px;
     text-align:center;
+    border:1px solid rgba(255,255,255,.05);
 }
 
 .number{
     color:#38bdf8;
-    font-size:21px;
-    font-weight:900;
     font-family:monospace;
+    font-size:22px;
+    font-weight:bold;
 }
 
 .result small{
     display:block;
-    margin-top:5px;
-    color:#94a3b8;
-    font-size:11px;
+    color:#64748b;
+    margin-top:6px;
+    font-size:10px;
 }
 
 .score{
+    margin:20px 0;
     text-align:center;
-    margin:18px 0;
-}
-
-.scoreNumber{
-    font-size:44px;
+    font-size:42px;
     font-weight:900;
     color:#22c55e;
-    text-shadow:0 0 20px rgba(34,197,94,.35);
-}
-
-.scoreText{
-    color:#94a3b8;
-    font-size:13px;
+    text-shadow:0 0 20px rgba(34,197,94,.3);
 }
 
 .service{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:10px;
-    padding:13px;
+    padding:14px;
     margin-top:8px;
+    border-radius:14px;
     background:#07101d;
-    border-radius:13px;
-    border:1px solid rgba(255,255,255,.05);
-    font-size:13px;
+    border:1px solid rgba(255,255,255,.04);
 }
 
-.good{color:#22c55e;font-weight:bold}
-.medium{color:#facc15;font-weight:bold}
-.bad{color:#ef4444;font-weight:bold}
+.good{
+    color:#22c55e;
+}
+
+.medium{
+    color:#facc15;
+}
+
+.bad{
+    color:#ef4444;
+}
 
 .advice{
-    margin-top:15px;
-    padding:15px;
-    border-radius:15px;
-    background:rgba(56,189,248,.07);
-    border:1px solid rgba(56,189,248,.15);
-    color:#dbeafe;
+    margin-top:16px;
+    padding:16px;
+    border-radius:16px;
     line-height:1.7;
-    font-size:13px;
+    color:#cbd5e1;
+    background:rgba(56,189,248,.07);
+    border:1px solid rgba(56,189,248,.14);
 }
 
-.hidden{display:none}
-
-.footer{
+.status{
     text-align:center;
-    color:#475569;
-    font-size:11px;
-    margin-top:20px;
+    margin-top:14px;
+    color:#94a3b8;
 }
 
-@media(max-width:500px){
-    .info{grid-template-columns:1fr}
-    .results{grid-template-columns:1fr}
-    .advanced{grid-template-columns:1fr}
-    .speedArea{height:250px}
-    .ring{width:205px;height:205px}
-    .liveSpeed{font-size:42px}
+.hidden{
+    display:none;
+}
+
+@media(max-width:550px){
+
+    .info{
+        grid-template-columns:1fr;
+    }
+
+    .results{
+        grid-template-columns:1fr;
+    }
+
+    .advanced{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .speed{
+        font-size:48px;
+    }
+
+    .logo{
+        font-size:34px;
+    }
 }
 </style>
 </head>
@@ -363,13 +333,14 @@ body.testing{
 <div class="container">
 
 <div class="header">
+    <div class="welcome">WELCOME TO</div>
     <div class="logo">⚡ NETPULSE</div>
-    <div class="welcome">WELCOME TO THE SMART INTERNET TEST</div>
+    <div class="subtitle">SMART INTERNET PERFORMANCE TEST</div>
 </div>
 
 <div class="card">
 
-<h3 class="connection-title">🌍 YOUR CONNECTION</h3>
+<h3>🌍 YOUR CONNECTION</h3>
 
 <div class="info">
 
@@ -395,28 +366,25 @@ body.testing{
 
 </div>
 
-<div class="speedArea">
-
-<div class="ring"></div>
-
-<div class="rocket" id="rocket">🚀</div>
-
-<div class="speedCenter">
-<div class="liveSpeed" id="liveSpeed">0.0</div>
-<div class="speedUnit" id="speedType">Mbps</div>
-</div>
-
-</div>
-
 <button class="start" id="start" onclick="startTest()">
 🚀 START SPEED TEST
 </button>
 
-<div class="status" id="status">Ready to test your connection</div>
+<div class="status" id="status">
+Ready to test your connection
+</div>
 
 </div>
 
 <div class="card hidden" id="results">
+
+<div class="rocket" id="rocket">🚀</div>
+<div class="flame">• • • • •</div>
+
+<div class="gauge">
+<div class="speed" id="liveSpeed">0.0</div>
+<div class="unit" id="speedType">Mbps</div>
+</div>
 
 <div class="results">
 
@@ -451,46 +419,41 @@ body.testing{
 
 </div>
 
-<div class="score">
-<div class="scoreNumber" id="score">--/100</div>
-<div class="scoreText">NETPULSE CONNECTION SCORE</div>
+<div class="score" id="score">
+--/100
 </div>
 
 <h3>📊 CONNECTION QUALITY</h3>
 
 <div class="service">
 <span>🎮 Competitive Gaming</span>
-<span id="gaming">--</span>
+<strong id="gaming">--</strong>
 </div>
 
 <div class="service">
 <span>🎬 4K Ultra HD</span>
-<span id="video">--</span>
+<strong id="video">--</strong>
 </div>
 
 <div class="service">
 <span>📡 Live Streaming</span>
-<span id="stream">--</span>
+<strong id="stream">--</strong>
 </div>
 
 <div class="service">
 <span>📞 Video Calls</span>
-<span id="calls">--</span>
+<strong id="calls">--</strong>
 </div>
 
 <div class="service">
 <span>📥 Large File Downloads</span>
-<span id="files">--</span>
+<strong id="files">--</strong>
 </div>
 
 <div class="advice" id="advice">
-💡 Smart Advisor will analyze your connection after the test.
+💡 Smart Advisor will appear here after the test.
 </div>
 
-</div>
-
-<div class="footer">
-NETPULSE — Smart Internet Performance Engine
 </div>
 
 </div>
@@ -501,20 +464,25 @@ async function loadIP(){
 
     try{
 
-        const response = await fetch("/my-ip");
-        const data = await response.json();
+        const res = await fetch(
+            "https://ipapi.co/json/",
+            {cache:"no-store"}
+        );
+
+        const data = await res.json();
 
         document.getElementById("ip").innerText =
             data.ip || "Unknown";
 
         document.getElementById("country").innerText =
-            data.flag + " " + (data.country || "Unknown");
+            (data.country_code ? getFlag(data.country_code) + " " : "") +
+            (data.country_name || "Unknown");
 
         document.getElementById("city").innerText =
             data.city || "Unknown";
 
         document.getElementById("isp").innerText =
-            data.isp || "Unknown";
+            data.org || "Unknown";
 
     }catch(e){
 
@@ -522,17 +490,25 @@ async function loadIP(){
         document.getElementById("country").innerText="Unknown";
         document.getElementById("city").innerText="Unknown";
         document.getElementById("isp").innerText="Unknown";
-
     }
-
 }
 
+function getFlag(code){
+
+    if(!code || code.length !== 2)
+        return "🌍";
+
+    return String.fromCodePoint(
+        ...[...code.toUpperCase()].map(
+            c => 127397 + c.charCodeAt()
+        )
+    );
+}
 
 async function pingTest(){
 
-    const results=[];
+    let values=[];
     let lost=0;
-
     const total=10;
 
     for(let i=0;i<total;i++){
@@ -541,7 +517,7 @@ async function pingTest(){
 
         const timeout=setTimeout(
             ()=>controller.abort(),
-            1500
+            2000
         );
 
         const start=performance.now();
@@ -560,53 +536,46 @@ async function pingTest(){
 
             clearTimeout(timeout);
 
-            results.push(end-start);
+            values.push(end-start);
 
         }catch(e){
 
-            clearTimeout(timeout);
             lost++;
-
         }
 
         await new Promise(
-            r=>setTimeout(r,60)
+            r=>setTimeout(r,70)
         );
-
     }
 
-    if(results.length===0){
+    if(values.length===0){
 
         return {
             ping:999,
-            jitter:999,
+            jitter:0,
             packetLoss:100
         };
-
     }
 
-    results.sort((a,b)=>a-b);
-
-    const ping=results[0];
+    values.sort((a,b)=>a-b);
 
     let jitter=0;
 
-    for(let i=1;i<results.length;i++){
+    for(let i=1;i<values.length;i++){
 
-        jitter+=Math.abs(
-            results[i]-results[i-1]
+        jitter += Math.abs(
+            values[i]-values[i-1]
         );
-
     }
 
     jitter =
-        results.length>1
-        ? jitter/(results.length-1)
+        values.length>1
+        ? jitter/(values.length-1)
         : 0;
 
-    return{
+    return {
 
-        ping:Math.round(ping),
+        ping:Math.round(values[0]),
 
         jitter:Math.round(jitter),
 
@@ -614,13 +583,54 @@ async function pingTest(){
             Number(
                 ((lost/total)*100).toFixed(1)
             )
-
     };
-
 }
 
-
 async function downloadTest(){
+
+    const live=
+        document.getElementById("liveSpeed");
+
+    const duration=6000;
+
+    const start=performance.now();
+
+    let bytes=0;
+
+    while(
+        performance.now()-start < duration
+    ){
+
+        const res=await fetch(
+            "/download?x="+Math.random(),
+            {cache:"no-store"}
+        );
+
+        const blob=await res.blob();
+
+        bytes += blob.size;
+
+        const elapsed=
+            (performance.now()-start)/1000;
+
+        const speed=
+            bytes*8/
+            elapsed/
+            1000000;
+
+        live.innerText=
+            speed.toFixed(1);
+    }
+
+    const elapsed=
+        (performance.now()-start)/1000;
+
+    return bytes*8/
+        elapsed/
+        1000000;
+}
+
+async function uploadTest(){
 
     const live=
         document.getElementById("liveSpeed");
@@ -631,55 +641,10 @@ async function downloadTest(){
 
     let bytes=0;
 
-    while(
-        performance.now()-start < duration
-    ){
-
-        const response=
-            await fetch(
-                "/download?x="+Math.random(),
-                {cache:"no-store"}
-            );
-
-        const blob=
-            await response.blob();
-
-        bytes+=blob.size;
-
-        const elapsed=
-            (performance.now()-start)/1000;
-
-        const speed=
-            (bytes*8)/elapsed/1000000;
-
-        live.innerText=
-            speed.toFixed(1);
-
-    }
-
-    const elapsed=
-        (performance.now()-start)/1000;
-
-    return (bytes*8)/elapsed/1000000;
-
-}
-
-
-async function uploadTest(){
-
-    const live=
-        document.getElementById("liveSpeed");
-
-    const duration=4000;
-
-    const start=performance.now();
-
-    let bytes=0;
-
-    const chunk=512*1024;
+    const size=512*1024;
 
     const payload=
-        new Uint8Array(chunk);
+        new Uint8Array(size);
 
     while(
         performance.now()-start < duration
@@ -693,33 +658,34 @@ async function uploadTest(){
             }
         );
 
-        bytes+=chunk;
+        bytes += size;
 
         const elapsed=
             (performance.now()-start)/1000;
 
         const speed=
-            (bytes*8)/elapsed/1000000;
+            bytes*8/
+            elapsed/
+            1000000;
 
         live.innerText=
             speed.toFixed(1);
-
     }
 
     const elapsed=
         (performance.now()-start)/1000;
 
-    return (bytes*8)/elapsed/1000000;
-
+    return bytes*8/
+        elapsed/
+        1000000;
 }
 
-
-function calculateScore(
+function scoreTest(
     download,
     upload,
     ping,
     jitter,
-    packetLoss
+    loss
 ){
 
     let score=100;
@@ -744,18 +710,19 @@ function calculateScore(
     if(jitter>20)
         score-=15;
 
-    if(packetLoss>0)
-        score-=packetLoss*3;
+    score -= loss*3;
 
     return Math.max(
-        Math.round(score),
-        0
+        0,
+        Math.round(score)
     );
-
 }
 
-
-function setStatus(id,text,type){
+function setResult(
+    id,
+    text,
+    type
+){
 
     const el=
         document.getElementById(id);
@@ -763,56 +730,59 @@ function setStatus(id,text,type){
     el.innerText=text;
 
     el.className=type;
-
 }
-
 
 function analyze(
     download,
     upload,
     ping,
     jitter,
-    packetLoss
+    loss
 ){
-
-    let gaming;
 
     if(
         ping<=40 &&
         jitter<=10 &&
-        packetLoss===0
+        loss===0
     ){
 
-        gaming="🟢 Excellent";
-        setStatus("gaming",gaming,"good");
+        setResult(
+            "gaming",
+            "🟢 Excellent",
+            "good"
+        );
 
     }else if(
         ping<=70 &&
-        packetLoss<5
+        loss<5
     ){
 
-        gaming="🟡 Good";
-        setStatus("gaming",gaming,"medium");
+        setResult(
+            "gaming",
+            "🟡 Good",
+            "medium"
+        );
 
     }else{
 
-        gaming="🔴 Poor";
-        setStatus("gaming",gaming,"bad");
-
+        setResult(
+            "gaming",
+            "🔴 Poor",
+            "bad"
+        );
     }
-
 
     if(download>=25){
 
-        setStatus(
+        setResult(
             "video",
-            "🟢 Excellent — 4K Ready",
+            "🟢 Excellent — 4K UHD",
             "good"
         );
 
     }else if(download>=12){
 
-        setStatus(
+        setResult(
             "video",
             "🟡 Good — Full HD",
             "medium"
@@ -820,18 +790,16 @@ function analyze(
 
     }else{
 
-        setStatus(
+        setResult(
             "video",
             "🔴 Poor",
             "bad"
         );
-
     }
-
 
     if(upload>=10 && jitter<15){
 
-        setStatus(
+        setResult(
             "stream",
             "🟢 Excellent — 1080p",
             "good"
@@ -839,29 +807,24 @@ function analyze(
 
     }else if(upload>=5){
 
-        setStatus(
+        setResult(
             "stream",
-            "🟡 Good — 720p",
+            "🟡 Moderate — 720p",
             "medium"
         );
 
     }else{
 
-        setStatus(
+        setResult(
             "stream",
             "🔴 Poor",
             "bad"
         );
-
     }
 
+    if(ping<=100 && loss<2){
 
-    if(
-        ping<=100 &&
-        packetLoss<2
-    ){
-
-        setStatus(
+        setResult(
             "calls",
             "🟢 Excellent",
             "good"
@@ -869,18 +832,16 @@ function analyze(
 
     }else{
 
-        setStatus(
+        setResult(
             "calls",
             "🟡 Fair",
             "medium"
         );
-
     }
-
 
     if(download>=50){
 
-        setStatus(
+        setResult(
             "files",
             "🟢 Very Fast",
             "good"
@@ -888,34 +849,32 @@ function analyze(
 
     }else if(download>=20){
 
-        setStatus(
+        setResult(
             "files",
-            "🟡 Good",
+            "🟡 Fast",
             "medium"
         );
 
     }else{
 
-        setStatus(
+        setResult(
             "files",
             "🔴 Slow",
             "bad"
         );
-
     }
 
+    let advice="";
 
-    let advice;
-
-    if(packetLoss>2){
+    if(loss>2){
 
         advice=
-        "High packet loss detected. Check your Wi-Fi signal, router, or Ethernet cable.";
+        "High packet loss detected. Check your Wi-Fi signal, router or network cable.";
 
     }else if(jitter>20){
 
         advice=
-        "Your connection has high jitter. Ethernet may provide a more stable connection.";
+        "Your connection has high jitter. This can cause unstable gaming and calls.";
 
     }else if(ping>80){
 
@@ -925,20 +884,17 @@ function analyze(
     }else if(download<15){
 
         advice=
-        "Download speed is relatively low for 4K streaming and large downloads.";
+        "Your download speed is relatively low for heavy downloads and 4K streaming.";
 
     }else{
 
         advice=
-        "Your connection is fast and stable for gaming, 4K streaming, calls and everyday use.";
-
+        "Your connection is fast and stable for gaming, streaming and everyday use.";
     }
 
     document.getElementById("advice").innerText=
         "💡 Smart Advisor: "+advice;
-
 }
-
 
 async function startTest(){
 
@@ -948,41 +904,43 @@ async function startTest(){
     const status=
         document.getElementById("status");
 
+    const results=
+        document.getElementById("results");
+
+    const rocket=
+        document.getElementById("rocket");
+
     const speedType=
         document.getElementById("speedType");
 
-    document.body.classList.add("testing");
-
     button.disabled=true;
 
-    button.innerText=
-        "⚡ TESTING...";
+    results.classList.remove("hidden");
 
-    document
-        .getElementById("results")
-        .classList.remove("hidden");
+    rocket.classList.add("running");
 
+    document.getElementById("liveSpeed").innerText="0.0";
 
-    document.getElementById("liveSpeed")
-        .innerText="0.0";
-
+    document.getElementById("download").innerText="--";
+    document.getElementById("upload").innerText="--";
+    document.getElementById("ping").innerText="--";
+    document.getElementById("jitter").innerText="--";
+    document.getElementById("packetLoss").innerText="--";
 
     status.innerText=
-        "🌐 Measuring connection quality...";
+        "🌐 Testing connection quality...";
 
     const quality=
         await pingTest();
 
+    document.getElementById("ping").innerText=
+        quality.ping;
 
-    document.getElementById("ping")
-        .innerText=quality.ping;
+    document.getElementById("jitter").innerText=
+        quality.jitter;
 
-    document.getElementById("jitter")
-        .innerText=quality.jitter;
-
-    document.getElementById("packetLoss")
-        .innerText=quality.packetLoss;
-
+    document.getElementById("packetLoss").innerText=
+        quality.packetLoss;
 
     status.innerText=
         "⬇️ Measuring download speed...";
@@ -990,14 +948,11 @@ async function startTest(){
     speedType.innerText=
         "Mbps — DOWNLOAD";
 
-
     const download=
         await downloadTest();
 
-
-    document.getElementById("download")
-        .innerText=download.toFixed(2);
-
+    document.getElementById("download").innerText=
+        download.toFixed(2);
 
     status.innerText=
         "⬆️ Measuring upload speed...";
@@ -1005,23 +960,19 @@ async function startTest(){
     speedType.innerText=
         "Mbps — UPLOAD";
 
-
     const upload=
         await uploadTest();
 
-
-    document.getElementById("upload")
-        .innerText=upload.toFixed(2);
-
+    document.getElementById("upload").innerText=
+        upload.toFixed(2);
 
     speedType.innerText="Mbps";
 
-    document.getElementById("liveSpeed")
-        .innerText=download.toFixed(1);
-
+    document.getElementById("liveSpeed").innerText=
+        download.toFixed(1);
 
     const score=
-        calculateScore(
+        scoreTest(
             download,
             upload,
             quality.ping,
@@ -1029,10 +980,8 @@ async function startTest(){
             quality.packetLoss
         );
 
-
-    document.getElementById("score")
-        .innerText=score+"/100";
-
+    document.getElementById("score").innerText=
+        score+"/100";
 
     analyze(
         download,
@@ -1042,8 +991,7 @@ async function startTest(){
         quality.packetLoss
     );
 
-
-    document.body.classList.remove("testing");
+    rocket.classList.remove("running");
 
     status.innerText=
         "✅ TEST COMPLETE";
@@ -1052,7 +1000,6 @@ async function startTest(){
 
     button.innerText=
         "🔄 TEST AGAIN";
-
 }
 
 loadIP();
@@ -1069,85 +1016,11 @@ def home():
     return render_template_string(HTML)
 
 
-@app.route("/my-ip")
-def my_ip():
-
-    try:
-
-        response=requests.get(
-            "https://ipapi.co/json/",
-            timeout=5
-        )
-
-        data=response.json()
-
-        country=data.get(
-            "country_name",
-            "Unknown"
-        )
-
-        country_code=data.get(
-            "country_code",
-            ""
-        )
-
-        flag="🌍"
-
-        if len(country_code)==2:
-
-            flag="".join(
-                chr(
-                    127397+ord(c)
-                )
-                for c in country_code.upper()
-            )
-
-        return jsonify({
-
-            "ip":data.get(
-                "ip",
-                "Unknown"
-            ),
-
-            "country":country,
-
-            "city":data.get(
-                "city",
-                "Unknown"
-            ),
-
-            "isp":data.get(
-                "org",
-                "Unknown"
-            ),
-
-            "flag":flag
-
-        })
-
-    except Exception:
-
-        return jsonify({
-
-            "ip":"Unavailable",
-
-            "country":"Unknown",
-
-            "city":"Unknown",
-
-            "isp":"Unknown",
-
-            "flag":"🌍"
-
-        })
-
-
 @app.route("/ping")
 def ping():
-
     return jsonify({
-        "ok":True,
-        "time":time.time()
+        "ok": True,
+        "time": time.time()
     })
 
 
@@ -1164,14 +1037,13 @@ def download():
         headers={
             "Cache-Control":
                 "no-store, no-cache, must-revalidate",
-
             "Content-Length":
                 str(len(data))
         }
     )
 
 
-@app.route("/upload",methods=["POST"])
+@app.route("/upload", methods=["POST"])
 def upload():
 
     request.get_data()
@@ -1184,9 +1056,9 @@ def upload():
 if __name__=="__main__":
 
     print()
-    print("⚡ NETPULSE ENGINE ONLINE")
+    print("⚡ NETPULSE v2 ENGINE ONLINE")
     print("==========================================")
-    print("🌐 Open: http://127.0.0.1:5000")
+    print("🌐 Local: http://127.0.0.1:5000")
     print("==========================================")
     print()
 
