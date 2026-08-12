@@ -803,7 +803,22 @@ loadIP();
 """
 
 
-@app.route("/")
+def home():
+    return render_template_string(HTML)@app.route("/robots.txt")
+def robots():
+    return """User-agent: *
+Allow: /
+
+Sitemap: https://netpulse-llgc.onrender.com/sitemap.xml
+"""@app.route("/sitemap.xml")
+def sitemap():
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://netpulse-llgc.onrender.com/</loc>
+    </url>
+</urlset>
+"""@app.route("/")
 def home():
     return render_template_string(HTML)
 
