@@ -803,14 +803,19 @@ loadIP();
 """
 
 
+@app.route("/")
 def home():
-    return render_template_string(HTML)@app.route("/robots.txt")
+    return render_template_string(HTML)
+
+@app.route("/robots.txt")
 def robots():
     return """User-agent: *
 Allow: /
 
 Sitemap: https://netpulse-llgc.onrender.com/sitemap.xml
-"""@app.route("/sitemap.xml")
+"""
+
+@app.route("/sitemap.xml")
 def sitemap():
     return """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -818,89 +823,5 @@ def sitemap():
         <loc>https://netpulse-llgc.onrender.com/</loc>
     </url>
 </urlset>
-"""@app.route("/")
-def home():
-    return render_template_string(HTML)
+"""
 
-
-@app.route("/lookup-ip")
-def lookup_ip():
-
-    ip=request.args.get("ip","").strip()
-
-    if not ip:
-
-        return jsonify({
-            "country":"Unknown",
-            "city":"Unknown",
-            "isp":"Unknown",
-            "flag":""
-        })
-
-    try:
-
-        r=requests.get(
-            "https://ipwho.is/"+ip,
-            timeout=10,
-            headers={
-                "User-Agent":"NETPULSE"
-            }
-        )
-
-        data=r.json()
-
-        code=(
-            data.get("country_code") or ""
-        ).upper()
-
-        flag=""
-
-        if len(code)==2:
-
-            flag="".join(
-                chr(127397+ord(c))
-                for c in code
-            )
-
-        connection=(
-            data.get("connection") or {}
-        )
-
-        return jsonify({
-
-            "country":
-                data.get("country") or "Unknown",
-
-            "city":
-                data.get("city") or "Unknown",
-
-            "isp":
-                connection.get("isp") or "Unknown",
-
-            "flag":flag
-        })
-
-    except Exception as e:
-
-        print("IP lookup error:",e)
-
-        return jsonify({
-            "country":"Unknown",
-            "city":"Unknown",
-            "isp":"Unknown",
-            "flag":""
-        })
-
-
-if __name__=="__main__":
-
-    print()
-    print("⚡ NETPULSE FINAL VERSION")
-    print("🌐 http://127.0.0.1:5000")
-    print()
-
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=False
-    )
