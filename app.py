@@ -806,7 +806,44 @@ loadIP();
 @app.route("/")
 def home():
     return render_template_string(HTML)
+@app.route("/lookup-ip")
+def lookup_ip():
+    import json
+    from urllib.request import urlopen
+    from urllib.parse import quote
 
+    ip = request.args.get("ip", "").strip()
+
+    if not ip:
+        return {"country": "Unknown", "city": "Unknown", "isp": "Unknown", "flag": ""}
+
+    try:
+        url = "https://ipwho.is/" + quote(ip)
+        with urlopen(url, timeout=5) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        if not data.get("success", False):
+            return {
+                "country": "Unknown",
+                "city": "Unknown",
+                "isp": "Unknown",
+                "flag": ""
+            }
+
+        return {
+            "country": data.get("country", "Unknown"),
+            "city": data.get("city", "Unknown"),
+            "isp": data.get("connection", {}).get("isp", "Unknown"),
+            "flag": data.get("flag", {}).get("emoji", "")
+        }
+
+    except Exception:
+        return {
+            "country": "Unknown",
+            "city": "Unknown",
+            "isp": "Unknown",
+            "flag": ""
+        }
 @app.route("/robots.txt")
 def robots():
     return """User-agent: *
